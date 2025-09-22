@@ -10,3 +10,8 @@ def main(blob: func.InputStream):
     # TODO: Insert into SQL tables: edi_835_raw, edi_835_claims, edi_835_services
 
     logging.info("Blob processed successfully.")
+
+
+# print("This won't run")
+
+
