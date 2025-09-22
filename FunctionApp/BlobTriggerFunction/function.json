@@ -1,0 +1,12 @@
+{
+  "scriptFile": "FunctionApp.py",
+  "bindings": [
+    {
+      "name": "inputBlob",
+      "type": "blobTrigger",
+      "direction": "in",
+      "path": "jfprofsol-uploads/{name}",
+      "connection": "AzureWebJobsStorage"
+    }
+  ]
+}
