@@ -12,6 +12,8 @@ def main(blob: func.InputStream):
     logging.info("Blob processed successfully.")
 
 
-# print("This won't run")
+# Trigger redeploy to fix indexing
+
+
 
 
