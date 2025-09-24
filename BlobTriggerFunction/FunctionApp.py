@@ -1,13 +1,13 @@
 import logging
 import azure.functions as func
 
-def main(myblob: func.InputStream):
+def main(inputBlob: func.InputStream):
     logging.info("BlobTriggerFunction fired.")
-    logging.info(f"Blob name: {myblob.name}")
-    logging.info(f"Blob size: {myblob.length} bytes")
+    logging.info(f"Blob name: {inputBlob.name}")
+    logging.info(f"Blob size: {inputBlob.length} bytes")
 
     try:
-        content = myblob.read().decode()
+        content = inputBlob.read().decode()
         logging.info(f"Blob content preview: {content[:200]}")
         logging.info("Blob decoded successfully.")
 
@@ -17,6 +17,7 @@ def main(myblob: func.InputStream):
 
 
 # Trigger redeploy to fix indexing
+
 
 
 
