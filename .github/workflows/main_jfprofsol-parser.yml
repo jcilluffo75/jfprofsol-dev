@@ -81,5 +81,6 @@ jobs:
         with:
           app-name: 'jfprofsol-parser'
           slot-name: 'Production'
-          package: ${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}
+          package: .
+
           
