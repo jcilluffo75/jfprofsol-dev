@@ -1,18 +1,23 @@
 import logging
 import azure.functions as func
 
-def main(blob: func.InputStream):
-    logging.info(f"Processing blob: {blob.name}, Size: {blob.length} bytes")
+def main(myblob: func.InputStream):
+    logging.info("BlobTriggerFunction fired.")
+    logging.info(f"Blob name: {myblob.name}")
+    logging.info(f"Blob size: {myblob.length} bytes")
 
-    content = blob.read().decode('utf-8')
-    
-    # TODO: Parse EDI/CSV/Excel content
-    # TODO: Insert into SQL tables: edi_835_raw, edi_835_claims, edi_835_services
+    try:
+        content = myblob.read().decode()
+        logging.info(f"Blob content preview: {content[:200]}")
+        logging.info("Blob decoded successfully.")
 
-    logging.info("Blob processed successfully.")
+        # Your parsing logic here
+    except Exception as e:
+        logging.error(f"Error during blob processing: {e}")
 
 
 # Trigger redeploy to fix indexing
+
 
 
 
