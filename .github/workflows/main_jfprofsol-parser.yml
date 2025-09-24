@@ -80,7 +80,7 @@ jobs:
         id: deploy-to-function
         with:
           app-name: 'jfprofsol-parser'
-          slot-name: 'Production'
-          package: .
-
+          package: ./
+          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE }}
           
+
