@@ -1,4 +1,5 @@
+pgsql
 azure-functions
-pandas
+pyodbc
 requests
-openpyxl
+
