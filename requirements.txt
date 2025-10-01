@@ -1,5 +1,5 @@
-pgsql
 azure-functions
 pyodbc
 requests
+azure-storage-blob>=12.24.0
 
