@@ -21,22 +21,28 @@ def split_composite(val, comp_sep="^"):
     return tuple(val.split(comp_sep)) if val else tuple()
 
 def main(inputBlob: func.InputStream):
-    logging.info("835 ingest started: %s (%d bytes)", inputBlob.name, inputBlob.length)
+    logging.info("=== 835 ingest started for %s (%d bytes) ===", inputBlob.name, inputBlob.length)
 
+    cn = None
     try:
         # ---------- read + tokenize ----------
         content = inputBlob.read().decode(errors="replace")
         segs = [s for s in content.split("~") if s.strip()]
         elem_sep = "|"
         comp_sep = "^"
+        logging.info("Parsed %d segments from blob", len(segs))
 
         # ---------- connect to SQL ----------
-        conn_str = os.environ["SQLConnectionString"]
-        logging.info("Connecting to SQL with SQLConnectionString...")
+        conn_str = os.environ.get("SQLConnectionString")
+        if not conn_str:
+            logging.error("❌ SQLConnectionString not found in App Settings")
+            return
+
+        logging.info("Connecting to SQL...")
         cn = pyodbc.connect(conn_str, timeout=15)
         cn.autocommit = False
         cur = cn.cursor()
-        logging.info("Connected to SQL.")
+        logging.info("✅ Connected to SQL.")
 
         # Prove connectivity
         cur.execute("SELECT @@VERSION;")
@@ -57,7 +63,7 @@ def main(inputBlob: func.InputStream):
                     (segment_type, segment_content, source_file_name, ingestion_timestamp)
                 VALUES (?, ?, ?, ?)
             """, raw_rows)
-            logging.info("Inserted %d raw segments for %s", len(raw_rows), inputBlob.name)
+            logging.info("Inserted %d raw rows into edi_835_raw", len(raw_rows))
 
         # ---------- parse claims + services ----------
         current_claim_db_id = None
@@ -161,15 +167,20 @@ def main(inputBlob: func.InputStream):
 
         # ---------- commit ----------
         cn.commit()
-        logging.info("Commit successful. Added %d claims, %d services, %d raw rows",
+        logging.info("✅ Commit successful. Added %d claims, %d services, %d raw rows",
                      claims_added, services_added, len(raw_rows))
-        logging.info("835 ingest complete for %s", inputBlob.name)
+        logging.info("=== 835 ingest complete for %s ===", inputBlob.name)
 
     except pyodbc.Error as e:
-        logging.error("pyodbc.Error: %s | args=%s", str(e), getattr(e, "args", None))
-        for i, arg in enumerate(getattr(e, "args", [])):
-            logging.error("pyodbc arg[%d]=%r", i, arg)
+        logging.error("❌ pyodbc.Error: %s | args=%s", str(e), getattr(e, "args", None), exc_info=True)
         raise
     except Exception as ex:
-        logging.error("General error: %s", repr(ex))
+        logging.error("❌ General error: %s", repr(ex), exc_info=True)
         raise
+    finally:
+        if cn:
+            try:
+                cn.close()
+                logging.info("SQL connection closed.")
+            except Exception:
+                pass
